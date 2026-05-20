@@ -1,9 +1,5 @@
-// Official Supabase SDK initialization
 const SUPABASE_URL = "https://supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndoYWp0YmVtZHl5aXdoZG5veXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzI3NTMsImV4cCI6MjA5NDcwODc1M30.YDZG5w9m54H3j4RTMjld3HGYa8JhL6jKHhDWq5eYvCM";
-
-// FIXED: Capital S ensures the background library connects properly without crashing
-const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let coins = 0;
 let userEmail = "";
@@ -11,8 +7,7 @@ const COINS_PER_AD = 5000;
 const REAL_CASH_PER_AD = 0.002;      
 const YOUR_PROFIT_MARGIN = 0.10;    
 
-// 1. SECURE SIGN UP
-async function handleSignUp() {
+function handleSignUp() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
     const msg = document.getElementById('auth-message');
@@ -20,17 +15,23 @@ async function handleSignUp() {
     if (!email || !password) return alert("Please enter an email and password.");
     msg.innerText = "Processing Sign Up...";
 
-    const { data, error } = await supabase.auth.signUp({ email, password });
-
-    if (error) {
-        msg.innerText = "Error: " + error.message;
-    } else {
-        msg.innerText = "Account Created! Check your email inbox & spam folder to verify.";
-    }
+    fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+        method: "POST",
+        headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, password: password })
+    })
+    .then(async res => {
+        const data = await res.json();
+        if (!res.ok) {
+            msg.innerText = "Error: " + (data.msg || data.error_description || "Failed");
+        } else {
+            msg.innerText = "Account Created! Check your email inbox & spam folder to verify.";
+        }
+    })
+    .catch(() => { msg.innerText = "Connection error."; });
 }
 
-// 2. SECURE LOGIN
-async function handleLogin() {
+function handleLogin() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
     const msg = document.getElementById('auth-message');
@@ -38,42 +39,65 @@ async function handleLogin() {
     if (!email || !password) return alert("Please enter your details.");
     msg.innerText = "Logging in...";
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-    if (error) {
-        msg.innerText = "Error: " + error.message;
-    } else {
-        userEmail = data.user.email;
-        loadUserCoins();
-    }
+    fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+        method: "POST",
+        headers: { "apikey": SUPABASE_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, password: password })
+    })
+    .then(async res => {
+        const data = await res.json();
+        if (data.error) {
+            msg.innerText = "Error: " + (data.error_description || "Authentication failed.");
+        } else {
+            userEmail = data.user.email;
+            loadUserCoins();
+        }
+    })
+    .catch(() => { msg.innerText = "Login failed."; });
 }
 
-// 3. LOAD PROFILE COINS FROM CLOUD
-async function loadUserCoins() {
-    const { data, error } = await supabase
-        .from('profiles')
-        .select('coins')
-        .eq('username', userEmail)
-        .single();
-
-    if (data) {
-        coins = data.coins;
-    } else {
+function loadUserCoins() {
+    fetch(`${SUPABASE_URL}/rest/v1/profiles?username=eq.${userEmail}`, {
+        method: "GET",
+        headers: { 
+            "apikey": SUPABASE_KEY, 
+            "Authorization": `Bearer ${SUPABASE_KEY}` 
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data && data.length > 0) {
+            coins = data[0].coins; // FIXED: Grab from the array correctly
+        } else {
+            coins = 0;
+        }
+        document.getElementById('auth-panel').style.display = "none";
+        document.getElementById('main-panel').style.display = "block";
+        document.getElementById('welcome-user').innerText = `Logged in as: ${userEmail}`;
+        updateInterface();
+    })
+    .catch(() => {
+        // Fallback to blank profile if it's your first time logging in
         coins = 0;
-    }
-
-    document.getElementById('auth-panel').style.display = "none";
-    document.getElementById('main-panel').style.display = "block";
-    document.getElementById('welcome-user').innerText = `Logged in as: ${userEmail}`;
-    updateInterface();
+        document.getElementById('auth-panel').style.display = "none";
+        document.getElementById('main-panel').style.display = "block";
+        document.getElementById('welcome-user').innerText = `Logged in as: ${userEmail}`;
+        updateInterface();
+    });
 }
 
-// 4. SAVE PROFILE COINS TO CLOUD
-async function saveToDatabase(currentCoins) {
+function saveToDatabase(currentCoins) {
     if (!userEmail) return;
-    await supabase
-        .from('profiles')
-        .upsert({ username: userEmail, coins: currentCoins });
+    fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
+        method: "POST",
+        headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json",
+            "Prefer": "resolution=merge-duplicates"
+        },
+        body: JSON.stringify({ username: userEmail, coins: currentCoins })
+    });
 }
 
 function updateInterface() {
