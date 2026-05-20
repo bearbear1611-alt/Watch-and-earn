@@ -1,35 +1,55 @@
-let coins = localStorage.getItem('userCoins') ? parseInt(localStorage.getItem('userCoins')) : 0;
-let totalPoolEstimate = 50.00; 
-let totalGlobalCoins = 1500000; 
+// Connected to your personal Supabase database
+const SUPABASE_URL = "https://supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndoYWp0YmVtZHl5aXdoZG5veXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzI3NTMsImV4cCI6MjA5NDcwODc1M30.YDZG5w9m54H3j4RTMjld3HGYa8JhL6jKHhDWq5eYvCM";
+
+// Initialize connection
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Balance and math rules
+let coins = 0;
+const COINS_PER_AD = 5000;
+const REAL_CASH_PER_AD = 0.01;      
+const YOUR_PROFIT_MARGIN = 0.10;    
+
+// Automatically sends your coins to the cloud database
+async function saveToDatabase(currentCoins) {
+    await supabase
+        .from('profiles')
+        .upsert({ username: 'tester', coins: currentCoins });
+}
 
 function updateInterface() {
     document.getElementById('user-coins').innerText = coins.toLocaleString();
     
-    let userShare = totalGlobalCoins > 0 ? (coins / totalGlobalCoins) : 0;
-    let estimatedPayout = userShare * totalPoolEstimate;
+    let totalGlobalCoins = coins + 250000; 
+    let totalGlobalAds = totalGlobalCoins / COINS_PER_AD;
+    let totalRevenuePool = totalGlobalAds * REAL_CASH_PER_AD;
+    let userPayoutPool = totalRevenuePool * (1 - YOUR_PROFIT_MARGIN);
+    let exchangeRatePerCoin = userPayoutPool / totalGlobalCoins;
+    let estimatedPayout = coins * exchangeRatePerCoin;
+    
     document.getElementById('est-cash').innerText = "£" + estimatedPayout.toFixed(2);
     
-    localStorage.setItem('userCoins', coins);
+    // Trigger database cloud save
+    saveToDatabase(coins);
 }
 
 function simulateAdWatch() {
-    coins += 5000;
-    totalGlobalCoins += 5000;
+    coins += COINS_PER_AD;
     updateInterface();
-    alert("Ad complete! 5,000 coins added to your cycle.");
+    alert("Ad complete! 5,000 coins saved to the cloud database.");
 }
 
+// 3-Hour Countdown Clock
 let duration = 3 * 60 * 60; 
 setInterval(function () {
     let hours = Math.floor(duration / 3600);
     let minutes = Math.floor((duration % 3600) / 60);
     let seconds = duration % 60;
-
     document.getElementById("countdown").textContent = 
         (hours < 10 ? "0" : "") + hours + ":" + 
         (minutes < 10 ? "0" : "") + minutes + ":" + 
         (seconds < 10 ? "0" : "") + seconds;
-
     if (--duration < 0) duration = 3 * 60 * 60; 
 }, 1000);
 
