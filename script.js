@@ -76,15 +76,14 @@ function showMainPanel() {
 
 function saveToDatabase(currentCoins) {
     if (!userEmail) return;
-    fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
-        method: "POST",
+    fetch(`${SUPABASE_URL}/rest/v1/profiles?username=eq.${userEmail}`, {
+        method: "PATCH",
         headers: {
             "apikey": SUPABASE_KEY,
             "Authorization": `Bearer ${SUPABASE_KEY}`,
-            "Content-Type": "application/json",
-            "Prefer": "resolution=merge-duplicates"
+            "Content-Type": "application/json"
         },
-        body: JSON.stringify({ username: userEmail, coins: currentCoins })
+        body: JSON.stringify({ coins: currentCoins })
     });
 }
 
