@@ -106,10 +106,16 @@ function updateInterface() {
     
     calculatedCashValue = coins * exchangeRatePerCoin;
     document.getElementById('est-cash').innerText = "£" + calculatedCashValue.toFixed(2);
+    
+    // PROGRESS BAR ENGINE: Calculates percentage toward a £5 goal milestone
+    let targetGoal = 5.00;
+    let percentage = Math.min((calculatedCashValue / targetGoal) * 100, 100);
+    document.getElementById('progress-bar').style.width = percentage + "%";
+    document.getElementById('progress-text').innerText = `${Math.floor(percentage)}% to £5 Payout`;
+    
     saveToDatabase(coins);
 }
 
-// PAYPAL CASH OUT WINDOW ACTIONS
 function openCashOutModal() {
     document.getElementById('modal-available-cash').innerText = "Available: £" + calculatedCashValue.toFixed(2);
     document.getElementById('modal-msg').innerText = "";
@@ -126,21 +132,15 @@ function submitPayoutRequest() {
     
     if (!paypalEmail) return alert("Please type your PayPal email address.");
     
-    // 1. REAL CALENDAR SAFETY LOCK: Check current date against Net-30 arrival
     const today = new Date();
     const currentDay = today.getDate();
-    
-    // Find the last day of next month (When ad money physically arrives)
-    const nextMonthLastDay = new Date(today.getFullYear(), today.getMonth() + 2, 0).getDate();
     const lastDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
     
-    // Lock logic: Only allow cash out during the final 3 days of the Net-30 settlement month
     if (currentDay < (lastDayOfCurrentMonth - 2)) {
         msg.style.color = "#ff3333";
         return msg.innerText = "Window Closed: Payout portal opens automatically on the final 3 days of the ad network payout period.";
     }
     
-    // 2. BALANCE THRESHOLD SAFETY CHECK
     if (calculatedCashValue < 1.00) {
         msg.style.color = "#ff3333";
         return msg.innerText = "Error: You must reach at least £1.00 to cash out.";
@@ -150,7 +150,7 @@ function submitPayoutRequest() {
     msg.innerText = "Processing automated monthly settlement...";
     
     setTimeout(() => {
-        coins = 0; // Deduct user coins on successful submission
+        coins = 0; 
         updateInterface();
         alert("Success! Your payout has been securely logged and scheduled for delivery to " + paypalEmail);
         closeCashOutModal();
@@ -165,13 +165,9 @@ function simulateAdWatch() {
 
 function handleLogout() { location.reload(); }
 
-// REAL NET-30 REVENUE PAYDAY COUNTDOWN CLOCK
 function updateMonthlyCountdown() {
     const today = new Date();
-    
-    // Target the end of next month (Net-30 cycle conclusion)
     const targetPayday = new Date(today.getFullYear(), today.getMonth() + 2, 0, 0, 0, 0);
-    
     const totalSecondsLeft = Math.floor((targetPayday - today) / 1000);
 
     if (totalSecondsLeft <= 0) {
