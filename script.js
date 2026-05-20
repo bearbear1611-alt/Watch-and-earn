@@ -13,7 +13,7 @@ function handleSignUp() {
     const msg = document.getElementById('auth-message');
 
     if (!email || !password) return alert("Please enter both email and password.");
-    msg.innerText = "Connecting to database...";
+    msg.innerText = "Registering with database...";
 
     fetch(`${SUPABASE_URL}/auth/v1/signup`, {
         method: "POST",
@@ -23,7 +23,7 @@ function handleSignUp() {
     .then(async res => {
         const data = await res.json();
         if (!res.ok) {
-            msg.innerText = "Error: " + (data.msg || data.error_description || "Could not register account");
+            msg.innerText = "Error: " + (data.msg || data.error_description || "Registration block");
         } else {
             msg.innerText = "Account Created! Head over to your email to verify your address.";
         }
@@ -36,8 +36,8 @@ function handleLogin() {
     const password = document.getElementById('auth-password').value;
     const msg = document.getElementById('auth-message');
 
-    if (!email || !password) return alert("Please enter your email and password.");
-    msg.innerText = "Verifying profile...";
+    if (!email || !password) return alert("Please enter your details.");
+    msg.innerText = "Verifying credentials...";
 
     fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
         method: "POST",
@@ -47,7 +47,7 @@ function handleLogin() {
     .then(async res => {
         const data = await res.json();
         if (data.error) {
-            msg.innerText = "Error: " + (data.error_description || "Check fields or verify email link.");
+            msg.innerText = "Error: " + (data.error_description || "Check login values.");
         } else {
             userEmail = data.user.email;
             loadUserCoins();
@@ -64,7 +64,7 @@ function loadUserCoins() {
     .then(res => res.json())
     .then(data => {
         if (data && data.length > 0) {
-            coins = data[0].coins; 
+            coins = data.coins; 
         } else {
             coins = 0;
         }
@@ -128,3 +128,5 @@ setInterval(function () {
         (seconds < 10 ? "0" : "") + seconds;
     if (--duration < 0) duration = 3 * 60 * 60; 
 }, 1000);
+
+updateInterface();
