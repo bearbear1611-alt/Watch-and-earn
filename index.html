@@ -1,98 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Watch and Earn</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Watch and Earn</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- AUTHENTICATION CONTAINER -->
-        <div id="auth-panel">
-            <h2>Sign In / Register</h2>
-            <input type="email" id="auth-email" placeholder="Enter your email" class="input-field">
-            <input type="password" id="auth-password" placeholder="Enter password" class="input-field">
-            <div class="auth-buttons">
-                <button onclick="handleLogin()">Login</button>
-                <button onclick="handleSignUp()" style="background-color: #6200ee; color: white;">Sign Up</button>
-            </div>
-            <p id="auth-message" style="margin-top: 15px; font-size: 0.9rem; color: #03dac6;"></p>
-        </div>
+<div class="app-container">
 
-        <!-- MAIN INTERFACE ENGINE PANEL -->
-        <div id="main-panel" style="display: none;">
-            <h1>Watch and Earn Engine</h1>
-            <p id="welcome-user" style="color: #03dac6; font-weight: bold; margin-bottom: 20px;">Welcome!</p>
-            
-            <div class="timer-box">
-                <p>Next Reward Payout In:</p>
-                <div id="countdown">00d 00h 00m 00s</div>
-            </div>
+  <div id="auth-panel">
+    <h2>Sign In / Register</h2>
+    <input type="email" id="auth-email" placeholder="Enter your email" class="input-field">
+    <input type="password" id="auth-password" placeholder="Enter password" class="input-field">
+    <div class="auth-buttons">
+      <button onclick="handleLogin()">Login</button>
+      <button onclick="handleSignUp()" style="background-color: #6200ee; color: white;">Sign Up</button>
+    </div>
+    <p id="auth-message" style="margin-top: 15px; font-size: 0.9rem; color: #03dac6;"></p>
+  </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3>Your Coins</h3>
-                    <p id="user-coins">0</p>
-                </div>
-                <div class="stat-card">
-                    <h3>Pending Balance</h3>
-                    <p id="est-cash">£0.00</p>
-                </div>
-            </div>
+  <div id="main-panel">
+    <h1>Watch and Earn</h1>
+    <p id="welcome-user" style="color: #03dac6; font-weight: bold; margin-bottom: 20px;">Welcome!</p>
 
-            <!-- PROGRESS TO PAYOUT BAR -->
-            <div style="background-color: #26262b; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: left;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px; color: #aaa;">
-                    <span>Goal Progress</span>
-                    <span id="progress-text">0% to £5 Payout</span>
-                </div>
-                <div style="background-color: #121214; border-radius: 10px; height: 12px; width: 100%; overflow: hidden;">
-                    <div id="progress-bar" style="background: linear-gradient(90deg, #03dac6, #6200ee); height: 100%; width: 0%; transition: width 0.4s ease;"></div>
-                </div>
-            </div>
-
-            <!-- CASH OUT BUTTON -->
-            <div style="margin-bottom: 20px;">
-                <button id="cashout-btn" onclick="openCashOutModal()" style="background-color: #ffb703; color: #000;">Cash Out Earnings</button>
-            </div>
-
-            <div class="ad-section">
-                <button id="watch-ad-btn" onclick="simulateAdWatch()">Watch Ad (+5,000 Coins)</button>
-            </div>
-            <button onclick="handleLogout()" style="background-color: #ff3333; margin-top: 20px; padding: 10px; color: white;">Logout</button>
-        </div>
-
-        <!-- LIVE BOTTOM LARGE RECTANGLE AD (300x250) -->
-        <div class="banner-ad-bottom" style="margin-top: 20px;">
-            <script>
-              atOptions = {
-                'key' : '23becf44ed4da4ecdd6d2910ae659136',
-                'format' : 'iframe',
-                'height' : 250,
-                'width' : 300,
-                'params' : {}
-              };
-            </script>
-            <script src="https://highperformanceformat.com"></script>
-        </div>
+    <div class="timer-box">
+      <p>Next Reward Payout In:</p>
+      <div id="countdown">00d 00h 00m 00s</div>
     </div>
 
-    <!-- POPUP WINDOW FOR PAYPAL REDEMPTION -->
-    <div id="payout-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 9999;">
-        <div style="background: #1a1a1e; padding: 30px; border-radius: 20px; width: 85%; max-width: 360px; text-align: center; border: 1px solid #333;">
-            <h3 style="color: #ffb703; margin-top: 0;">PayPal Cash Out</h3>
-            <p id="modal-available-cash" style="font-weight: bold;">Available: £0.00</p>
-            <p style="font-size: 0.85rem; color: #aaa;">Minimum payout threshold: £1.00</p>
-            <input type="email" id="paypal-email" placeholder="Your PayPal Email Address" class="input-field" style="margin-top: 15px;">
-            <div class="auth-buttons" style="margin-top: 15px;">
-                <button onclick="submitPayoutRequest()" style="background-color: #03dac6; color: #000;">Confirm Payout</button>
-                <button onclick="closeCashOutModal()" style="background-color: #ff3333; color: white;">Cancel</button>
-            </div>
-            <p id="modal-msg" style="margin-top: 15px; font-size: 0.9rem; color: #ffb703;"></p>
-        </div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Your Coins</h3>
+        <p id="user-coins">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Pending Balance</h3>
+        <p id="est-cash">£0.00</p>
+      </div>
     </div>
 
-    <script src="script.js"></script>
+    <div style="background-color: #26262b; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: left;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px; color: #aaa;">
+        <span>Goal Progress</span>
+        <span id="progress-text">0% to £5 Payout</span>
+      </div>
+      <div style="background-color: #121214; border-radius: 10px; height: 12px; width: 100%; overflow: hidden;">
+        <div id="progress-bar" style="background: linear-gradient(90deg, #03dac6, #6200ee); height: 100%; width: 0%; transition: width 0.4s ease;"></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <button onclick="openCashOutModal()" style="background-color: #ffb703; color: #000;">Cash Out Earnings</button>
+    </div>
+
+    <div class="ad-section">
+      <button onclick="simulateAdWatch()">Watch Ad (+5,000 Coins)</button>
+    </div>
+
+    <button onclick="handleLogout()" style="background-color: #ff3333; margin-top: 20px; padding: 10px; color: white;">Logout</button>
+  </div>
+
+</div>
+
+<div id="payout-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 9999;">
+  <div style="background: #1a1a1e; padding: 30px; border-radius: 20px; width: 85%; max-width: 360px; text-align: center; border: 1px solid #333;">
+    <h3 style="color: #ffb703; margin-top: 0;">PayPal Cash Out</h3>
+    <p id="modal-available-cash" style="font-weight: bold;">Available: £0.00</p>
+    <p style="font-size: 0.85rem; color: #aaa;">Minimum payout: £1.00</p>
+    <input type="email" id="paypal-email" placeholder="Your PayPal Email Address" class="input-field" style="margin-top: 15px;">
+    <div class="auth-buttons" style="margin-top: 15px;">
+      <button onclick="submitPayoutRequest()" style="background-color: #03dac6; color: #000;">Confirm Payout</button>
+      <button onclick="closeCashOutModal()" style="background-color: #ff3333; color: white;">Cancel</button>
+    </div>
+    <p id="modal-msg" style="margin-top: 15px; font-size: 0.9rem; color: #ffb703;"></p>
+  </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
