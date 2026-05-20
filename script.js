@@ -2,8 +2,8 @@
 const SUPABASE_URL = "https://supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndoYWp0YmVtZHl5aXdoZG5veXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzI3NTMsImV4cCI6MjA5NDcwODc1M30.YDZG5w9m54H3j4RTMjld3HGYa8JhL6jKHhDWq5eYvCM";
 
-// Initialize connection
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// FIXED: Capital S ensures the browser connects properly without crashing
+const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Balance and math rules
 let coins = 0;
@@ -13,9 +13,13 @@ const YOUR_PROFIT_MARGIN = 0.10;
 
 // Automatically sends your coins to the cloud database
 async function saveToDatabase(currentCoins) {
-    await supabase
-        .from('profiles')
-        .upsert({ username: 'tester', coins: currentCoins });
+    try {
+        await supabase
+            .from('profiles')
+            .upsert({ username: 'tester', coins: currentCoins });
+    } catch (err) {
+        console.error("Database connection issue:", err);
+    }
 }
 
 function updateInterface() {
@@ -54,3 +58,4 @@ setInterval(function () {
 }, 1000);
 
 updateInterface();
+
