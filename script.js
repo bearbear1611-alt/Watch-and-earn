@@ -2,8 +2,8 @@
 const SUPABASE_URL = "https://supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndoYWp0YmVtZHl5aXdoZG5veXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzI3NTMsImV4cCI6MjA5NDcwODc1M30.YDZG5w9m54H3j4RTMjld3HGYa8JhL6jKHhDWq5eYvCM";
 
-// This loads the secure background client
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// FIXED: Capital S ensures the background library connects properly without crashing
+const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let coins = 0;
 let userEmail = "";
