@@ -7,17 +7,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- 1. LEFT SIDE HIGH-PAYING VERTICAL AD (160x600) -->
-    <div class="side-ad left-ad">
-        <!-- [PASTE 160x600 ADSTERRA CODE HERE] -->
-    </div>
-
     <div class="app-container">
-        <!-- 2. TOP BANNER AD (468x60) -->
-        <div class="banner-ad-top">
-            <!-- [PASTE 468x60 ADSTERRA CODE HERE] -->
-        </div>
-
         <!-- AUTHENTICATION CONTAINER -->
         <div id="auth-panel">
             <h2>Sign In / Register</h2>
@@ -31,12 +21,12 @@
         </div>
 
         <!-- MAIN INTERFACE ENGINE PANEL -->
-        <div id="main-panel">
+        <div id="main-panel" style="display: none;">
             <h1>Watch and Earn Engine</h1>
             <p id="welcome-user" style="color: #03dac6; font-weight: bold; margin-bottom: 20px;">Welcome!</p>
             
             <div class="timer-box">
-                <p>Next Monthly Payout In:</p>
+                <p>Next Reward Payout In:</p>
                 <div id="countdown">00d 00h 00m 00s</div>
             </div>
 
@@ -73,7 +63,7 @@
             <button onclick="handleLogout()" style="background-color: #ff3333; margin-top: 20px; padding: 10px; color: white;">Logout</button>
         </div>
 
-        <!-- 3. LIVE BOTTOM LARGE RECTANGLE AD (300x250) -->
+        <!-- LIVE BOTTOM LARGE RECTANGLE AD (300x250) -->
         <div class="banner-ad-bottom" style="margin-top: 20px;">
             <script>
               atOptions = {
@@ -86,11 +76,6 @@
             </script>
             <script src="https://highperformanceformat.com"></script>
         </div>
-    </div>
-
-    <!-- 4. RIGHT SIDE HIGH-PAYING VERTICAL AD (160x600) -->
-    <div class="side-ad right-ad">
-        <!-- [PASTE 160x600 ADSTERRA CODE HERE AGAIN] -->
     </div>
 
     <!-- POPUP WINDOW FOR PAYPAL REDEMPTION -->
