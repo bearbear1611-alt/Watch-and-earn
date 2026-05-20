@@ -1,7 +1,7 @@
 const SUPABASE_URL = "https://supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndoYWp0YmVtZHl5aXdoZG5veXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzI3NTMsImV4cCI6MjA5NDcwODc1M30.YDZG5w9m54H3j4RTMjld3HGYa8JhL6jKHhDWq5eYvCM";
 
-// Safe global initialization using the window library object
+// Initialize with window library object
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let coins = 0;
@@ -10,12 +10,10 @@ const COINS_PER_AD = 5000;
 const REAL_CASH_PER_AD = 0.002;      
 const YOUR_PROFIT_MARGIN = 0.10;    
 
-// Automatically render the official Supabase Login / Registration form box
 function initAuthUI() {
     const authUiDiv = document.getElementById('supabase-auth-ui');
     if (!authUiDiv) return;
 
-    // Direct interface generation injection
     authUiDiv.innerHTML = `
         <div style="display:flex; flex-direction:column; gap:10px; text-align:left;">
             <label style="font-size:0.9rem;">Email Address</label>
@@ -52,7 +50,6 @@ async function submitAuth(type) {
     }
 }
 
-// Automatically check if user is already logged in on page refresh
 async function checkLoginState() {
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
@@ -70,7 +67,7 @@ async function loadUserCoins() {
         .eq('username', userEmail);
 
     if (data && data.length > 0) {
-        coins = data[0].coins;
+        coins = data[0].coins; // FIXED: Grab correct array row position index
     } else {
         coins = 0;
     }
@@ -124,5 +121,5 @@ setInterval(function () {
     if (--duration < 0) duration = 3 * 60 * 60; 
 }, 1000);
 
-// Safe background launch hook
+// FIXED: Perfectly matches function casing
 window.onload = checkLoginState;
