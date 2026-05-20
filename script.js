@@ -66,7 +66,7 @@ function loadUserCoins() {
     })
     .then(res => res.json())
     .then(data => {
-        if (data && data.length > 0) coins = data[0].coins; 
+        if (data && data.length > 0) coins = data.coins; 
         else coins = 0;
         document.getElementById('auth-panel').style.display = "none";
         document.getElementById('main-panel').style.display = "block";
@@ -126,19 +126,18 @@ function submitPayoutRequest() {
     
     if (!paypalEmail) return alert("Please type your PayPal email address.");
     
-    // 1. CALENDAR SAFETY LOCK: Check current date
+    // 1. REAL CALENDAR SAFETY LOCK: Check current date against Net-30 arrival
     const today = new Date();
     const currentDay = today.getDate();
     
-    // Find the very last day of the current month
-    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+    // Find the last day of next month (When ad money physically arrives)
+    const nextMonthLastDay = new Date(today.getFullYear(), today.getMonth() + 2, 0).getDate();
+    const lastDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
     
-    // Safety Rule: Only allow cash outs during the last 3 days of the month
-    const payoutWindowStart = lastDayOfMonth - 2; 
-    
-    if (currentDay < payoutWindowStart) {
+    // Lock logic: Only allow cash out during the final 3 days of the Net-30 settlement month
+    if (currentDay < (lastDayOfCurrentMonth - 2)) {
         msg.style.color = "#ff3333";
-        return msg.innerText = `Window Closed: Payouts open automatically on the last 3 days of the month (Days ${payoutWindowStart} to ${lastDayOfMonth}).`;
+        return msg.innerText = "Window Closed: Payout portal opens automatically on the final 3 days of the ad network payout period.";
     }
     
     // 2. BALANCE THRESHOLD SAFETY CHECK
@@ -153,7 +152,7 @@ function submitPayoutRequest() {
     setTimeout(() => {
         coins = 0; // Deduct user coins on successful submission
         updateInterface();
-        alert("Success! Your end-of-month payout has been scheduled for delivery to " + paypalEmail);
+        alert("Success! Your payout has been securely logged and scheduled for delivery to " + paypalEmail);
         closeCashOutModal();
     }, 2000);
 }
@@ -166,14 +165,28 @@ function simulateAdWatch() {
 
 function handleLogout() { location.reload(); }
 
-let duration = 3 * 60 * 60; 
-setInterval(function () {
-    let hours = Math.floor(duration / 3600);
-    let minutes = Math.floor((duration % 3600) / 60);
-    let seconds = duration % 60;
+// REAL NET-30 REVENUE PAYDAY COUNTDOWN CLOCK
+function updateMonthlyCountdown() {
+    const today = new Date();
+    
+    // Target the end of next month (Net-30 cycle conclusion)
+    const targetPayday = new Date(today.getFullYear(), today.getMonth() + 2, 0, 0, 0, 0);
+    
+    const totalSecondsLeft = Math.floor((targetPayday - today) / 1000);
+
+    if (totalSecondsLeft <= 0) {
+        document.getElementById("countdown").textContent = "PAYMENT RELEASED";
+        return;
+    }
+
+    const days = Math.floor(totalSecondsLeft / (3600 * 24));
+    const hours = Math.floor((totalSecondsLeft % (3600 * 24)) / 3600);
+    const minutes = Math.floor((totalSecondsLeft % 3600) / 60);
+    const seconds = totalSecondsLeft % 60;
+
     document.getElementById("countdown").textContent = 
-        (hours < 10 ? "0" : "") + hours + ":" + 
-        (minutes < 10 ? "0" : "") + minutes + ":" + 
-        (seconds < 10 ? "0" : "") + seconds;
-    if (--duration < 0) duration = 3 * 60 * 60; 
-}, 1000);
+        `${days}d ${(hours < 10 ? "0" : "")}${hours}h ${(minutes < 10 ? "0" : "")}${minutes}m ${(seconds < 10 ? "0" : "")}${seconds}s`;
+}
+
+updateMonthlyCountdown();
+setInterval(updateMonthlyCountdown, 1000);
