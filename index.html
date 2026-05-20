@@ -8,13 +8,19 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- OFFICIAL SUPABASE AUTH LOGIN CONTAINER -->
-        <div id="auth-container">
+        <!-- SIMPLE AUTHENTICATION PANEL -->
+        <div id="auth-panel">
             <h2>Sign In / Register</h2>
-            <div id="supabase-auth-ui"></div>
+            <input type="email" id="auth-email" placeholder="Enter your email" class="input-field">
+            <input type="password" id="auth-password" placeholder="Enter password" class="input-field">
+            <div class="auth-buttons">
+                <button onclick="handleLogin()">Login</button>
+                <button onclick="handleSignUp()" style="background-color: #6200ee; color: white;">Sign Up</button>
+            </div>
+            <p id="auth-message" style="margin-top: 15px; font-size: 0.9rem; color: #03dac6;"></p>
         </div>
 
-        <!-- MAIN WATCH AND EARN INTERFACE (Hidden until logged in) -->
+        <!-- MAIN DASHBOARD ENGINE -->
         <div id="main-panel" style="display: none;">
             <h1>Watch and Earn Engine</h1>
             <p id="welcome-user" style="color: #03dac6; font-weight: bold; margin-bottom: 20px;">Welcome!</p>
@@ -41,10 +47,6 @@
             <button onclick="handleLogout()" style="background-color: #ff3333; margin-top: 20px; padding: 10px; color: white;">Logout</button>
         </div>
     </div>
-
-    <!-- Official UI Widgets Loader CDN Scripts -->
-    <script src="https://jsdelivr.net"></script>
-    <script src="https://jsdelivr.net"></script>
     <script src="script.js"></script>
 </body>
 </html>
