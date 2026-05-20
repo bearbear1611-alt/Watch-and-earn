@@ -1,25 +1,23 @@
-// Connected to your personal Supabase database
-const SUPABASE_URL = "https://supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndoYWp0YmVtZHl5aXdoZG5veXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzI3NTMsImV4cCI6MjA5NDcwODc1M30.YDZG5w9m54H3j4RTMjld3HGYa8JhL6jKHhDWq5eYvCM";
-
-// FIXED: Capital S ensures the browser connects properly without crashing
-const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// Balance and math rules
+// Base configuration
 let coins = 0;
 const COINS_PER_AD = 5000;
 const REAL_CASH_PER_AD = 0.01;      
 const YOUR_PROFIT_MARGIN = 0.10;    
 
-// Automatically sends your coins to the cloud database
-async function saveToDatabase(currentCoins) {
-    try {
-        await supabase
-            .from('profiles')
-            .upsert({ username: 'tester', coins: currentCoins });
-    } catch (err) {
-        console.error("Database connection issue:", err);
-    }
+// Pushes data straight to your database table using a standard web request
+function saveToDatabase(currentCoins) {
+    const targetUrl = "https://supabase.co";
+    
+    fetch(targetUrl, {
+        method: "POST",
+        headers: {
+            "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndoYWp0YmVtZHl5aXdoZG5veXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzI3NTMsImV4cCI6MjA5NDcwODc1M30.YDZG5w9m54H3j4RTMjld3HGYa8JhL6jKHhDWq5eYvCM",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndoYWp0YmVtZHl5aXdoZG5veXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzI3NTMsImV4cCI6MjA5NDcwODc1M30.YDZG5w9m54H3j4RTMjld3HGYa8JhL6jKHhDWq5eYvCM",
+            "Content-Type": "application/json",
+            "Prefer": "resolution=merge-duplicates"
+        },
+        body: JSON.stringify({ username: "tester", coins: currentCoins })
+    }).catch(err => console.log("Database update paused:", err));
 }
 
 function updateInterface() {
@@ -34,14 +32,14 @@ function updateInterface() {
     
     document.getElementById('est-cash').innerText = "£" + estimatedPayout.toFixed(2);
     
-    // Trigger database cloud save
+    // Fire the save request
     saveToDatabase(coins);
 }
 
 function simulateAdWatch() {
     coins += COINS_PER_AD;
     updateInterface();
-    alert("Ad complete! 5,000 coins saved to the cloud database.");
+    alert("Ad complete! 5,000 coins tracked to the cloud.");
 }
 
 // 3-Hour Countdown Clock
@@ -58,4 +56,3 @@ setInterval(function () {
 }, 1000);
 
 updateInterface();
-
