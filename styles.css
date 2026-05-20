@@ -1,0 +1,51 @@
+body {
+    background-color: #121214;
+    color: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+.app-container {
+    background-color: #1a1a1e;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+}
+.timer-box {
+    background: linear-gradient(135deg, #6200ee, #7c4dff);
+    padding: 15px;
+    border-radius: 12px;
+    margin: 20px 0;
+}
+#countdown {
+    font-size: 2rem;
+    font-weight: bold;
+}
+.stats-grid {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.stat-card {
+    background-color: #26262b;
+    flex: 1;
+    padding: 15px;
+    border-radius: 12px;
+}
+button {
+    background-color: #03dac6;
+    color: #000;
+    border: none;
+    padding: 15px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    width: 100%;
+}

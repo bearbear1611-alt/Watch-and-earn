@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JustPlay Web</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <h1>JustPlay Web Engine</h1>
+        
+        <div class="timer-box">
+            <p>Next Reward Payout In:</p>
+            <div id="countdown">03:00:00</div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Your Coins</h3>
+                <p id="user-coins">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Estimated Cash</h3>
+                <p id="est-cash">Calculating...</p>
+            </div>
+        </div>
+
+        <div class="ad-section">
+            <button id="watch-ad-btn" onclick="simulateAdWatch()">Watch Ad (+5,000 Coins)</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
