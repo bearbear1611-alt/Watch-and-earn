@@ -2,7 +2,7 @@
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.has('monlix') || urlParams.has('widget') || urlParams.has('app') || window.location.search.length > 3) {
     setTimeout(() => {
-        if(document.getElementById('main-panel')) document.getElementById('main-panel').style.display = "block";
+        document.body.classList.add('logged-in');
     }, 500);
 }
 
@@ -68,15 +68,15 @@ function loadUserCoins() {
     .then(data => {
         if (data && data.length > 0) coins = data.coins; 
         else coins = 0;
-        document.getElementById('auth-panel').style.display = "none";
-        document.getElementById('main-panel').style.display = "block";
+        
+        // UNLOCK VIEW: Safely tells the CSS to drop the login gate
+        document.body.classList.add('logged-in');
         document.getElementById('welcome-user').innerText = `Logged in as: ${userEmail}`;
         updateInterface();
     })
     .catch(() => {
         coins = 0;
-        document.getElementById('auth-panel').style.display = "none";
-        document.getElementById('main-panel').style.display = "block";
+        document.body.classList.add('logged-in');
         document.getElementById('welcome-user').innerText = `Logged in as: ${userEmail}`;
         updateInterface();
     });
@@ -107,7 +107,6 @@ function updateInterface() {
     calculatedCashValue = coins * exchangeRatePerCoin;
     document.getElementById('est-cash').innerText = "£" + calculatedCashValue.toFixed(2);
     
-    // PROGRESS BAR ENGINE: Calculates percentage toward a £5 goal milestone
     let targetGoal = 5.00;
     let percentage = Math.min((calculatedCashValue / targetGoal) * 100, 100);
     document.getElementById('progress-bar').style.width = percentage + "%";
@@ -129,7 +128,6 @@ function closeCashOutModal() {
 function submitPayoutRequest() {
     const paypalEmail = document.getElementById('paypal-email').value;
     const msg = document.getElementById('modal-msg');
-    
     if (!paypalEmail) return alert("Please type your PayPal email address.");
     
     const today = new Date();
