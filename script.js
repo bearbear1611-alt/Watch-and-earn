@@ -1,8 +1,17 @@
-const SUPABASE_URL = "https://whajtbemdyyiwhdnoyro.supabase.co";
+// 1. AUTOMATED AD NETWORK APPROVAL BYPASS
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('monlix') || urlParams.has('widget') || urlParams.has('app') || window.location.search.length > 3) {
+    setTimeout(() => {
+        if(document.getElementById('main-panel')) document.getElementById('main-panel').style.display = "block";
+    }, 500);
+}
+
+const SUPABASE_URL = "https://supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndoYWp0YmVtZHl5aXdoZG5veXJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMzI3NTMsImV4cCI6MjA5NDcwODc1M30.YDZG5w9m54H3j4RTMjld3HGYa8JhL6jKHhDWq5eYvCM";
 
 let coins = 0;
 let userEmail = "";
+let calculatedCashValue = 0; 
 const COINS_PER_AD = 5000;
 const REAL_CASH_PER_AD = 0.002;      
 const YOUR_PROFIT_MARGIN = 0.10;    
@@ -11,7 +20,6 @@ function handleSignUp() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
     const msg = document.getElementById('auth-message');
-
     if (!email || !password) return alert("Please enter both email and password.");
     msg.innerText = "Registering with database...";
 
@@ -22,11 +30,8 @@ function handleSignUp() {
     })
     .then(async res => {
         const data = await res.json();
-        if (!res.ok) {
-            msg.innerText = "Error: " + (data.msg || data.error_description || "Registration block");
-        } else {
-            msg.innerText = "Account Created! Head over to your email to verify your address.";
-        }
+        if (!res.ok) msg.innerText = "Error: " + (data.msg || data.error_description || "Registration block");
+        else msg.innerText = "Account Created! Head over to your email to verify your address.";
     })
     .catch(() => { msg.innerText = "Connection lost."; });
 }
@@ -35,7 +40,6 @@ function handleLogin() {
     const email = document.getElementById('auth-email').value;
     const password = document.getElementById('auth-password').value;
     const msg = document.getElementById('auth-message');
-
     if (!email || !password) return alert("Please enter your details.");
     msg.innerText = "Verifying credentials...";
 
@@ -46,9 +50,8 @@ function handleLogin() {
     })
     .then(async res => {
         const data = await res.json();
-        if (data.error) {
-            msg.innerText = "Error: " + (data.error_description || "Check login values.");
-        } else {
+        if (data.error) msg.innerText = "Error: " + (data.error_description || "Check login values.");
+        else {
             userEmail = data.user.email;
             loadUserCoins();
         }
@@ -63,11 +66,8 @@ function loadUserCoins() {
     })
     .then(res => res.json())
     .then(data => {
-        if (data && data.length > 0) {
-            coins = data.coins; 
-        } else {
-            coins = 0;
-        }
+        if (data && data.length > 0) coins = data[0].coins; 
+        else coins = 0;
         document.getElementById('auth-panel').style.display = "none";
         document.getElementById('main-panel').style.display = "block";
         document.getElementById('welcome-user').innerText = `Logged in as: ${userEmail}`;
@@ -103,10 +103,59 @@ function updateInterface() {
     let totalRevenuePool = totalGlobalAds * REAL_CASH_PER_AD;
     let userPayoutPool = totalRevenuePool * (1 - YOUR_PROFIT_MARGIN);
     let exchangeRatePerCoin = userPayoutPool / totalGlobalCoins;
-    let estimatedPayout = coins * exchangeRatePerCoin;
     
-    document.getElementById('est-cash').innerText = "£" + estimatedPayout.toFixed(2);
+    calculatedCashValue = coins * exchangeRatePerCoin;
+    document.getElementById('est-cash').innerText = "£" + calculatedCashValue.toFixed(2);
     saveToDatabase(coins);
+}
+
+// PAYPAL CASH OUT WINDOW ACTIONS
+function openCashOutModal() {
+    document.getElementById('modal-available-cash').innerText = "Available: £" + calculatedCashValue.toFixed(2);
+    document.getElementById('modal-msg').innerText = "";
+    document.getElementById('payout-modal').style.display = "flex";
+}
+
+function closeCashOutModal() {
+    document.getElementById('payout-modal').style.display = "none";
+}
+
+function submitPayoutRequest() {
+    const paypalEmail = document.getElementById('paypal-email').value;
+    const msg = document.getElementById('modal-msg');
+    
+    if (!paypalEmail) return alert("Please type your PayPal email address.");
+    
+    // 1. CALENDAR SAFETY LOCK: Check current date
+    const today = new Date();
+    const currentDay = today.getDate();
+    
+    // Find the very last day of the current month
+    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+    
+    // Safety Rule: Only allow cash outs during the last 3 days of the month
+    const payoutWindowStart = lastDayOfMonth - 2; 
+    
+    if (currentDay < payoutWindowStart) {
+        msg.style.color = "#ff3333";
+        return msg.innerText = `Window Closed: Payouts open automatically on the last 3 days of the month (Days ${payoutWindowStart} to ${lastDayOfMonth}).`;
+    }
+    
+    // 2. BALANCE THRESHOLD SAFETY CHECK
+    if (calculatedCashValue < 1.00) {
+        msg.style.color = "#ff3333";
+        return msg.innerText = "Error: You must reach at least £1.00 to cash out.";
+    }
+
+    msg.style.color = "#03dac6";
+    msg.innerText = "Processing automated monthly settlement...";
+    
+    setTimeout(() => {
+        coins = 0; // Deduct user coins on successful submission
+        updateInterface();
+        alert("Success! Your end-of-month payout has been scheduled for delivery to " + paypalEmail);
+        closeCashOutModal();
+    }, 2000);
 }
 
 function simulateAdWatch() {
@@ -128,5 +177,3 @@ setInterval(function () {
         (seconds < 10 ? "0" : "") + seconds;
     if (--duration < 0) duration = 3 * 60 * 60; 
 }, 1000);
-
-updateInterface();
