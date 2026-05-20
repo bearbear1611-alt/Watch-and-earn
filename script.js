@@ -1,8 +1,8 @@
-// 1. AUTOMATED AD NETWORK APPROVAL BYPASS
+// AUTOMATED AD NETWORK APPROVAL BYPASS
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.has('monlix') || urlParams.has('widget') || urlParams.has('app') || window.location.search.length > 3) {
     setTimeout(() => {
-        document.body.classList.add('logged-in');
+        if(document.getElementById('main-panel')) document.getElementById('main-panel').style.display = "block";
     }, 500);
 }
 
@@ -68,15 +68,15 @@ function loadUserCoins() {
     .then(data => {
         if (data && data.length > 0) coins = data.coins; 
         else coins = 0;
-        
-        // UNLOCK VIEW: Safely tells the CSS to drop the login gate
-        document.body.classList.add('logged-in');
+        document.getElementById('auth-panel').style.display = "none";
+        document.getElementById('main-panel').style.display = "block";
         document.getElementById('welcome-user').innerText = `Logged in as: ${userEmail}`;
         updateInterface();
     })
     .catch(() => {
         coins = 0;
-        document.body.classList.add('logged-in');
+        document.getElementById('auth-panel').style.display = "none";
+        document.getElementById('main-panel').style.display = "block";
         document.getElementById('welcome-user').innerText = `Logged in as: ${userEmail}`;
         updateInterface();
     });
@@ -165,11 +165,18 @@ function handleLogout() { location.reload(); }
 
 function updateMonthlyCountdown() {
     const today = new Date();
-    const targetPayday = new Date(today.getFullYear(), today.getMonth() + 2, 0, 0, 0, 0);
+    const currentDay = today.getDate();
+    let targetDay = 15; 
+    
+    if (currentDay > 15) {
+        targetDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+    }
+    
+    const targetPayday = new Date(today.getFullYear(), today.getMonth(), targetDay, 23, 59, 59);
     const totalSecondsLeft = Math.floor((targetPayday - today) / 1000);
 
     if (totalSecondsLeft <= 0) {
-        document.getElementById("countdown").textContent = "PAYMENT RELEASED";
+        document.getElementById("countdown").textContent = "PAYDAY RELEASED";
         return;
     }
 
